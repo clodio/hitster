@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<!-- saved from url=(0059)file:///C:/Users/pwyh295/Downloads/hitster_bingo%20(1).html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hitster Bingo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a1a;
+            transition: background-color 0.4s ease-out;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #instruction {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            pointer-events: none;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        #challenge-display {
+            position: absolute;
+            left: 50%;
+            top: 48%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+            width: min(90vw, 680px);
+            pointer-events: none;
+        }
+
+        #challenge-display.active {
+            display: flex;
+        }
+
+        #challenge-image {
+            width: min(56vw, 350px);
+            max-height: min(70vw, 260px);
+            object-fit: contain;
+            border-radius: 50px;
+            /* box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+            background: rgba(255, 255, 255, 0.18); */
+        }
+
+        #challenge-text {
+            margin: 0;
+            font-size: clamp(1.1rem, 3vw, 2rem);
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        #mini-challenge-display {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px 12px;
+            /* border-radius: 14px; */
+            /* background: rgba(0, 0, 0, 0.28); */
+            max-width: 100%;
+        }
+
+        #mini-challenge-display.active {
+            display: flex;
+        }
+
+        #mini-challenge-image {
+            width: 70px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 10px;
+            /* background: rgba(255, 255, 255, 0.18); */
+            flex-shrink: 0;
+        }
+
+        #mini-challenge-text {
+            margin: 0;
+            font-size: clamp(0.75rem, 2vw, 1rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            text-align: left;
+        }
+
+        #top-controls {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        #options-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        #options-toggle {
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #options-panel {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 14px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 150px;
+        }
+
+        #options-panel.active {
+            display: flex;
+        }
+
+        #disco-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 12;
+            transition: opacity 0.2s ease;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 1) 0 3px, transparent 4px),
+                radial-gradient(circle at 26% 76%, rgba(255, 255, 255, 0.9) 0 3px, transparent 4px),
+                radial-gradient(circle at 78% 16%, rgba(255, 255, 255, 0.92) 0 3px, transparent 4px),
+                radial-gradient(circle at 86% 74%, rgba(255, 255, 255, 1) 0 3px, transparent 4px),
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.5) 0 2px, transparent 3px),
+                radial-gradient(circle at 40% 30%, rgba(255, 255, 255, 0.72) 0 2px, transparent 3px),
+                radial-gradient(circle at 62% 68%, rgba(255, 255, 255, 0.68) 0 2px, transparent 3px);
+            mix-blend-mode: screen;
+            filter: blur(0.25px) brightness(1.2) saturate(1.4);
+        }
+
+        #disco-overlay.active {
+            opacity: 1;
+            animation: discoPulse 0.42s linear infinite;
+        }
+
+        #disco-overlay::before,
+        #disco-overlay::after {
+            content: '';
+            position: absolute;
+            inset: -25%;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.18) 0 8px, transparent 9px),
+                radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.15) 0 4px, transparent 5px),
+                radial-gradient(circle at 65% 68%, rgba(255, 255, 255, 0.12) 0 6px, transparent 7px);
+            background-size: 120px 120px, 160px 160px, 180px 180px;
+            opacity: 0.85;
+        }
+
+        #disco-overlay::before {
+            animation: discoDrift 0.95s linear infinite;
+        }
+
+        #disco-overlay::after {
+            animation: discoDriftReverse 1.15s linear infinite;
+            opacity: 0.85;
+            transform: scale(1.08);
+        }
+
+        @keyframes discoPulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: brightness(1.05) saturate(1.2);
+            }
+
+            20% {
+                transform: scale(1.01);
+                filter: brightness(1.5) saturate(1.8);
+            }
+
+            50% {
+                transform: scale(1.02);
+                filter: brightness(2) saturate(2.2);
+            }
+
+            80% {
+                transform: scale(1.01);
+                filter: brightness(1.65) saturate(1.9);
+            }
+        }
+
+        @keyframes discoDrift {
+            from {
+                transform: translate3d(-3%, -2%, 0) rotate(0deg);
+            }
+
+            to {
+                transform: translate3d(3%, 2%, 0) rotate(540deg);
+            }
+        }
+
+        @keyframes discoDriftReverse {
+            from {
+                transform: translate3d(3%, 2%, 0) rotate(0deg) scale(1.08);
+            }
+
+            to {
+                transform: translate3d(-3%, -2%, 0) rotate(-540deg) scale(1.08);
+            }
+        }
+
+        .option-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .option-btn.active {
+            background: #ffffff;
+            color: #111;
+        }
+
+        #new-game-btn {
+            border: 0;
+            border-radius: 999px;
+            padding: 10px 18px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.9);
+            color: #111;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+        }
+
+        #new-game-btn:hover {
+            background: white;
+        }
+
+        body.active #instruction {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+
+        #history-bar {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            max-width: 85%;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        #history-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-box {
+            width: min(90vw, 460px);
+            background: #111;
+            color: #fff;
+            border-radius: 18px;
+            padding: 22px;
+            text-align: center;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .modal-box p {
+            margin: 0 0 16px;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .modal-actions button {
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #ffffff;
+            color: #111;
+        }
+
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .history-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #instruction {
+                font-size: 1.8rem;
+            }
+
+            #challenge-display {
+                top: 45%;
+                gap: 10px;
+            }
+
+            #challenge-image {
+                width: min(72vw, 400px);
+                max-height: 400px;
+            }
+
+            #top-controls {
+                top: 12px;
+            }
+
+            #options-controls {
+                top: 12px;
+                right: 12px;
+            }
+
+            #history-bar {
+                bottom: 20px;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .history-dot {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body class="active" style="background-color: rgb(153, 51, 255);">
+    <div id="disco-overlay" aria-hidden="true"></div>
+    <div id="top-controls">
+        <button id="new-game-btn" type="button">Nouvelle partie</button>
+    </div>
+
+    <div id="options-controls">
+        <button id="options-toggle" type="button" aria-label="Options" title="Options">&#9881;</button>
+        <div id="options-panel" aria-label="Modes d'affichage">
+            <button id="option-with-cards" class="option-btn" type="button">Avec cartes</button>
+            <button id="option-without-cards" class="option-btn active" type="button">Sans cartes</button>
+        </div>
+    </div>
+
+    <div id="instruction">HITSTER BINGO</div>
+    <div id="challenge-display" aria-live="polite">
+        <img id="challenge-image" alt="Illustration du challenge" src="">
+        <p id="challenge-text"></p>
+        <div id="mini-challenge-display" aria-hidden="true">
+            <img id="mini-challenge-image" alt="Rappel du challenge" src="">
+            <p id="mini-challenge-text"></p>
+        </div>
+    </div>
+    <div id="history-bar"><div class="history-dot" style="background-color: rgb(153, 51, 255);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div><div class="history-dot" style="background-color: rgb(82, 201, 82);"></div><div class="history-dot" style="background-color: rgb(255, 51, 153);"></div><div class="history-dot" style="background-color: rgb(153, 51, 255);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div><div class="history-dot" style="background-color: rgb(231, 231, 78);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div></div>
+
+    <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-box">
+            <p id="confirm-title">Voulez-vous lancer une nouvelle partie ?</p>
+            <div class="modal-actions">
+                <button id="confirm-yes" class="btn-primary" type="button">Oui</button>
+                <button id="confirm-no" class="btn-secondary" type="button">Non</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="difficulty-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="difficulty-title">
+        <div class="modal-box">
+            <p id="difficulty-title">Choisissez le mode de la nouvelle partie</p>
+            <div class="modal-actions">
+                <button id="mode-normal" class="btn-primary" type="button">Normal</button>
+                <button id="mode-hard" class="btn-secondary" type="button">Difficile</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ['#ff3333', '#9933FF', '#52c952', '#e7e74e', '#3399FF'];
+        const bar = document.getElementById('history-bar');
+        const text = document.getElementById('instruction');
+        const challengeDisplay = document.getElementById('challenge-display');
+        const challengeImage = document.getElementById('challenge-image');
+        const challengeText = document.getElementById('challenge-text');
+        const miniChallengeDisplay = document.getElementById('mini-challenge-display');
+        const miniChallengeImage = document.getElementById('mini-challenge-image');
+        const miniChallengeText = document.getElementById('mini-challenge-text');
+        const newGameBtn = document.getElementById('new-game-btn');
+        const confirmModal = document.getElementById('confirm-modal');
+        const difficultyModal = document.getElementById('difficulty-modal');
+        const confirmYesBtn = document.getElementById('confirm-yes');
+        const confirmNoBtn = document.getElementById('confirm-no');
+        const modeNormalBtn = document.getElementById('mode-normal');
+        const modeHardBtn = document.getElementById('mode-hard');
+        const optionsToggleBtn = document.getElementById('options-toggle');
+        const optionsPanel = document.getElementById('options-panel');
+        const optionWithCardsBtn = document.getElementById('option-with-cards');
+        const optionWithoutCardsBtn = document.getElementById('option-without-cards');
+        const discoOverlay = document.getElementById('disco-overlay');
+
+        let started = false;
+        let currentMode = 'normal';
+        let optionsMode = 'without-cards';
+        let currentRoundColor = null;
+        let shuffledCardNumbers = [];
+        let cardCursor = 0;
+        let cardStep = 0;
+        let transitionTimerIds = [];
+        let isTransitionRunning = false;
+        let discoOffTimerId = null;
+
+        const imageBase = './img/';
+        const colorKeyByHex = {
+            '#52c952': 'green',
+            '#ff3333': 'red',
+            '#e7e74e': 'yellow',
+            '#9933ff': 'violet',
+            '#3399ff': 'blue'
+        };
+
+        const modeRules = {
+            normal: {
+                green: { text: 'Artiste solo ou groupe/duo', image: 'solo ou duo_groupe.jpg' },
+                red: { text: 'Avant 2000 ?', image: 'avant_ou_apres_2000_v2.jpg' },
+                yellow: { text: 'A 4 ans près', image: 'a_4_années_pres.jpg' },
+                violet: { text: 'Décennie', image: 'decade.jpg' },
+                blue: { text: 'A 2 ans près', image: 'a_2_annees_pres.jpg' }
+            },
+            hard: {
+                green: { text: 'Titre de la chanson', image: 'titre.jpg' },
+                red: { text: 'Année exacte', image: 'anneee_exacte_2.jpg' },
+                yellow: { text: 'Nom du groupe ou du chanteur', image: 'nom_du_groupe_ou_chanteur.jpg' },
+                violet: { text: 'Décennie', image: 'decade.jpg' },
+                blue: { text: 'A 3 ans près', image: 'a_3_années_pres.jpg' }
+            }
+        };
+
+        function shuffleCardNumbers() {
+            const values = Array.from({ length: 308 }, (_, i) => i + 1);
+            for (let i = values.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [values[i], values[j]] = [values[j], values[i]];
+            }
+            return values;
+        }
+
+        function getCurrentCardNumber() {
+            if (cardCursor >= shuffledCardNumbers.length) {
+                shuffledCardNumbers = shuffleCardNumbers();
+                cardCursor = 0;
+            }
+            return shuffledCardNumbers[cardCursor];
+        }
+
+        function setOptionsMode(mode) {
+            optionsMode = mode;
+            optionWithCardsBtn.classList.toggle('active', mode === 'with-cards');
+            optionWithoutCardsBtn.classList.toggle('active', mode === 'without-cards');
+            resetGameState(currentMode);
+        }
+
+        function getRuleForColor(color) {
+            const colorKey = colorKeyByHex[color.toLowerCase()];
+            return modeRules[currentMode]?.[colorKey];
+        }
+
+        function hideMiniChallenge() {
+            miniChallengeDisplay.classList.remove('active');
+            miniChallengeImage.src = '';
+            miniChallengeText.innerText = '';
+        }
+
+        function hideCentralChallenge() {
+            challengeDisplay.classList.remove('active');
+            challengeImage.src = '';
+            challengeText.innerText = '';
+            challengeText.style.display = 'block';
+            text.style.display = 'block';
+            hideMiniChallenge();
+        }
+
+        function showMiniChallenge(color) {
+            const rule = getRuleForColor(color);
+            if (!rule) {
+                hideMiniChallenge();
+                return;
+            }
+
+            miniChallengeImage.src = encodeURI(imageBase + rule.image);
+            miniChallengeText.innerText = rule.text;
+            miniChallengeDisplay.classList.add('active');
+        }
+
+        function updateChallengeDisplay(color) {
+            const rule = getRuleForColor(color);
+            if (!rule) {
+                challengeDisplay.classList.remove('active');
+                return;
+            }
+
+            challengeText.innerText = rule.text;
+            challengeText.style.display = 'block';
+            challengeImage.src = encodeURI(imageBase + rule.image);
+            challengeDisplay.classList.add('active');
+            text.style.display = 'none';
+            hideMiniChallenge();
+        }
+
+        function isModalOpen() {
+            return !confirmModal.classList.contains('hidden') || !difficultyModal.classList.contains('hidden');
+        }
+
+        function openModal(modal) {
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal(modal) {
+            modal.classList.add('hidden');
+        }
+
+        function resetGameState(mode) {
+            currentMode = mode;
+            started = false;
+            currentRoundColor = null;
+            cardStep = 0;
+            cardCursor = 0;
+            shuffledCardNumbers = shuffleCardNumbers();
+            transitionTimerIds.forEach((timerId) => clearTimeout(timerId));
+            transitionTimerIds = [];
+            isTransitionRunning = false;
+            if (discoOffTimerId) {
+                clearTimeout(discoOffTimerId);
+                discoOffTimerId = null;
+            }
+            discoOverlay.classList.remove('active');
+            bar.innerHTML = '';
+            document.body.classList.remove('active');
+            document.body.style.backgroundColor = '#1a1a1a';
+            text.innerText = "HITSTER BINGO";
+            text.style.display = 'block';
+            hideCentralChallenge();
+        }
+
+        newGameBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            openModal(confirmModal);
+        });
+
+        confirmNoBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeModal(confirmModal);
+        });
+
+        confirmYesBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeModal(confirmModal);
+            openModal(difficultyModal);
+        });
+
+        modeNormalBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeModal(difficultyModal);
+            resetGameState('normal');
+        });
+
+        modeHardBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            closeModal(difficultyModal);
+            resetGameState('hard');
+        });
+
+        optionsToggleBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            optionsPanel.classList.toggle('active');
+        });
+
+        optionWithCardsBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            setOptionsMode('with-cards');
+            optionsPanel.classList.remove('active');
+        });
+
+        optionWithoutCardsBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            setOptionsMode('without-cards');
+            optionsPanel.classList.remove('active');
+        });
+
+        confirmModal.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        difficultyModal.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        optionsPanel.addEventListener('click', (event) => {
+            event.stopPropagation();
+        });
+
+        function renderChallengeForColor(color) {
+            document.body.style.backgroundColor = color;
+
+            if (!started) {
+                started = true;
+                document.body.classList.add('active');
+                text.innerText = 'HITSTER BINGO';
+            }
+
+            updateChallengeDisplay(color);
+
+            const dot = document.createElement('div');
+            dot.className = 'history-dot';
+            dot.style.backgroundColor = color;
+            bar.append(dot);
+
+            while (bar.children.length > 6) {
+                bar.removeChild(bar.firstElementChild);
+            }
+        }
+
+        function renderCardImage(face) {
+            const cardNumber = getCurrentCardNumber();
+            const suffix = face === 'recto' ? 'recto' : 'verso';
+            challengeImage.src = encodeURI(`./hitster_cards_transparent/${cardNumber}_${suffix}.png`);
+            challengeText.style.display = 'none';
+            challengeDisplay.classList.add('active');
+            text.style.display = 'none';
+
+            if (currentRoundColor) {
+                showMiniChallenge(currentRoundColor);
+            }
+
+            if (face === 'verso') {
+                cardCursor += 1;
+            }
+        }
+
+        function runColorTransition(finalColor, onComplete) {
+            if (isTransitionRunning) {
+                return;
+            }
+
+            isTransitionRunning = true;
+            discoOverlay.classList.add('active');
+            hideCentralChallenge();
+            transitionTimerIds.forEach((timerId) => clearTimeout(timerId));
+            transitionTimerIds = [];
+
+            if (discoOffTimerId) {
+                clearTimeout(discoOffTimerId);
+                discoOffTimerId = null;
+            }
+
+            const palette = colors.slice();
+            const cycleColors = [];
+
+            for (let repeat = 0; repeat < 2; repeat += 1) {
+                cycleColors.push(...palette);
+            }
+
+            if (cycleColors[cycleColors.length - 1] === finalColor) {
+                cycleColors.push(palette[(palette.indexOf(finalColor) + 1) % palette.length]);
+            }
+
+            cycleColors.push(finalColor);
+
+            document.body.style.backgroundColor = '#1a1a1a';
+
+            cycleColors.forEach((color, index) => {
+                const timerId = setTimeout(() => {
+                    document.body.style.backgroundColor = color;
+
+                    if (index === cycleColors.length - 1) {
+                        isTransitionRunning = false;
+                        discoOffTimerId = setTimeout(() => {
+                            discoOverlay.classList.remove('active');
+                            discoOffTimerId = null;
+                        }, 180);
+                        onComplete();
+                    }
+                }, 90 * (index + 1));
+
+                transitionTimerIds.push(timerId);
+            });
+        }
+
+        document.body.onclick = () => {
+            if (isModalOpen()) {
+                return;
+            }
+
+            if (isTransitionRunning) {
+                return;
+            }
+
+            optionsPanel.classList.remove('active');
+
+            if (optionsMode === 'with-cards') {
+                if (cardStep === 0) {
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    currentRoundColor = color;
+                    runColorTransition(color, () => {
+                        renderChallengeForColor(color);
+                        cardStep = 1;
+                    });
+                    return;
+                }
+
+                if (cardStep === 1) {
+                    if (currentRoundColor) {
+                        document.body.style.backgroundColor = currentRoundColor;
+                    }
+                    renderCardImage('recto');
+                    cardStep = 2;
+                    return;
+                }
+
+                if (currentRoundColor) {
+                    document.body.style.backgroundColor = currentRoundColor;
+                }
+                renderCardImage('verso');
+                cardStep = 0;
+                return;
+            }
+
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            runColorTransition(color, () => {
+                renderChallengeForColor(color);
+            });
+        };
+
+        resetGameState(currentMode);
+    </script>
+
+
+</body></html>

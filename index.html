@@ -1,1 +1,72 @@
-<html><body></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hitster - Accueil</title>
+	<style>
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-family: Arial, sans-serif;
+			background: linear-gradient(135deg, #101820, #1d2b64);
+		}
+
+		.menu {
+			background: rgba(255, 255, 255, 0.08);
+			padding: 28px;
+			border-radius: 16px;
+			-webkit-backdrop-filter: blur(8px);
+			backdrop-filter: blur(8px);
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			min-width: 280px;
+		}
+
+		h1 {
+			margin: 0 0 8px;
+			text-align: center;
+			color: #fff;
+			font-size: 1.3rem;
+		}
+
+		.menu-btn {
+			display: inline-block;
+			text-align: center;
+			text-decoration: none;
+			border: 0;
+			border-radius: 10px;
+			padding: 12px 14px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: transform 0.15s ease, opacity 0.15s ease;
+		}
+
+		.menu-btn:hover {
+			transform: translateY(-1px);
+			opacity: 0.95;
+		}
+
+		.btn-random {
+			background: #f5c542;
+			color: #111;
+		}
+
+		.btn-card {
+			background: #33b1ff;
+			color: #111;
+		}
+	</style>
+</head>
+<body>
+	<div class="menu">
+		<h1>Hitster  bingo</h1>
+		<a class="menu-btn btn-random" href="./hitster_random.html">Lancer le jeu</a>
+		<a class="menu-btn btn-card" href="./hitster_card.html">Carte bingo</a>
+	</div>
+</body>
+</html>
