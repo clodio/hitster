@@ -30,6 +30,26 @@
             max-width: 500px;
             width: 100%;
             border: 3px solid #ff00ff;
+            position: relative;
+        }
+
+        .board-selector {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #ff00ff;
+            background: rgba(255, 0, 255, 0.2);
+            user-select: none;
+        }
+
+        .board-selector:hover {
+            background: rgba(255, 0, 255, 0.35);
         }
 
         .grid {
@@ -145,37 +165,226 @@
         .button:active {
             transform: translateY(0);
         }
+
+        .board-picker-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .board-picker {
+            background: #1f1f1f;
+            border: 2px solid #ff00ff;
+            border-radius: 12px;
+            padding: 20px;
+            width: min(360px, 100%);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+        }
+
+        .board-picker-title {
+            color: #ff00ff;
+            text-align: center;
+            margin-bottom: 14px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .board-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .board-option {
+            border: 1px solid #ff00ff;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #ffffff;
+            padding: 10px 0;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .board-option:hover {
+            background: #3a3a3a;
+        }
     </style>
 </head>
 
 <body>
     <div class="card">
+        <div class="board-selector" id="boardSelector">#1</div>
         <div class="grid" id="grid"></div>
         <div class="title">HITSTER</div>
         <textarea class="text-area" id="textArea" placeholder="Write here..."></textarea>
         <button class="button" onclick="clearText()">Clear text</button>
     </div>
 
+    <div class="board-picker-overlay" id="boardPickerOverlay">
+        <div class="board-picker">
+            <div class="board-picker-title">Choisir un plateau</div>
+            <div class="board-options" id="boardOptions"></div>
+        </div>
+    </div>
+
     <script>
-        const colors = ['yellow', 'blue', 'purple', 'green', 'blue',
-            'yellow', 'pink', 'blue', 'pink', 'yellow',
-            'green', 'purple', 'green', 'yellow', 'pink',
-            'pink', 'blue', 'purple', 'pink', 'purple',
-            'yellow', 'purple', 'green', 'blue', 'green'];
+        const COLOR_POOL = ['yellow', 'green', 'blue', 'pink', 'purple'];
+        const BOARD_SIZE = 5;
+        const BOARD_COUNT = 10;
+        const MAX_PER_COLOR_PER_LINE = 2;
+        const TARGET_PER_COLOR = (BOARD_SIZE * BOARD_SIZE) / COLOR_POOL.length;
+
+        if (!Number.isInteger(TARGET_PER_COLOR)) {
+            throw new Error('La taille du plateau doit permettre une repartition egale des couleurs');
+        }
 
         const grid = document.getElementById('grid');
+        const boardSelector = document.getElementById('boardSelector');
+        const boardPickerOverlay = document.getElementById('boardPickerOverlay');
+        const boardOptions = document.getElementById('boardOptions');
+        const textArea = document.getElementById('textArea');
 
-        colors.forEach((color, index) => {
-            const cell = document.createElement('div');
-            cell.className = `cell ${color}`;
-            cell.onclick = function () {
-                this.classList.toggle('marked');
-            };
-            grid.appendChild(cell);
-        });
+        function shuffle(array) {
+            const result = [...array];
+            for (let i = result.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        }
+
+        function buildBoard() {
+            const board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+            const rowCounts = Array.from({ length: BOARD_SIZE }, () => ({}));
+            const colCounts = Array.from({ length: BOARD_SIZE }, () => ({}));
+            const totalCounts = Object.fromEntries(COLOR_POOL.map((color) => [color, 0]));
+
+            function canPlace(row, col, color) {
+                const rowCount = rowCounts[row][color] || 0;
+                const colCount = colCounts[col][color] || 0;
+                const totalCount = totalCounts[color] || 0;
+                return rowCount < MAX_PER_COLOR_PER_LINE
+                    && colCount < MAX_PER_COLOR_PER_LINE
+                    && totalCount < TARGET_PER_COLOR;
+            }
+
+            function place(row, col, color) {
+                board[row][col] = color;
+                rowCounts[row][color] = (rowCounts[row][color] || 0) + 1;
+                colCounts[col][color] = (colCounts[col][color] || 0) + 1;
+                totalCounts[color] += 1;
+            }
+
+            function unplace(row, col, color) {
+                board[row][col] = null;
+                rowCounts[row][color] -= 1;
+                colCounts[col][color] -= 1;
+                totalCounts[color] -= 1;
+            }
+
+            function backtrack(position) {
+                if (position === BOARD_SIZE * BOARD_SIZE) {
+                    return true;
+                }
+
+                const row = Math.floor(position / BOARD_SIZE);
+                const col = position % BOARD_SIZE;
+                const candidateColors = shuffle(COLOR_POOL);
+
+                for (const color of candidateColors) {
+                    if (!canPlace(row, col, color)) {
+                        continue;
+                    }
+
+                    place(row, col, color);
+                    if (backtrack(position + 1)) {
+                        return true;
+                    }
+                    unplace(row, col, color);
+                }
+
+                return false;
+            }
+
+            const success = backtrack(0);
+            if (!success) {
+                throw new Error('Impossible de generer un plateau valide');
+            }
+
+            return board.flat();
+        }
+
+        function buildBoards() {
+            const boards = [];
+            for (let i = 0; i < BOARD_COUNT; i += 1) {
+                boards.push(buildBoard());
+            }
+            return boards;
+        }
+
+        const boards = buildBoards();
+        let currentBoardIndex = 0;
+
+        function renderBoard(boardIndex) {
+            const colors = boards[boardIndex];
+            grid.innerHTML = '';
+
+            colors.forEach((color) => {
+                const cell = document.createElement('div');
+                cell.className = `cell ${color}`;
+                cell.onclick = function () {
+                    this.classList.toggle('marked');
+                };
+                grid.appendChild(cell);
+            });
+
+            currentBoardIndex = boardIndex;
+            boardSelector.textContent = `#${currentBoardIndex + 1}`;
+        }
+
+        function openBoardPicker() {
+            boardPickerOverlay.style.display = 'flex';
+        }
+
+        function closeBoardPicker() {
+            boardPickerOverlay.style.display = 'none';
+        }
+
+        function initBoardOptions() {
+            for (let i = 0; i < BOARD_COUNT; i += 1) {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.className = 'board-option';
+                option.textContent = `#${i + 1}`;
+                option.onclick = () => {
+                    renderBoard(i);
+                    closeBoardPicker();
+                };
+                boardOptions.appendChild(option);
+            }
+        }
+
+        boardSelector.onclick = openBoardPicker;
+        boardPickerOverlay.onclick = function (event) {
+            if (event.target === boardPickerOverlay) {
+                closeBoardPicker();
+            }
+        };
+
+        textArea.onclick = function () {
+            this.select();
+        };
+
+        initBoardOptions();
+        renderBoard(currentBoardIndex);
 
         function clearText() {
-            document.getElementById('textArea').value = '';
+            textArea.value = '';
         }
     </script>
 </body>
