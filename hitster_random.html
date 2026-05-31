@@ -116,44 +116,6 @@
             pointer-events: auto;
         }
 
-        #options-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 20;
-            pointer-events: auto;
-        }
-
-        #options-toggle {
-            width: 44px;
-            height: 44px;
-            border: 0;
-            border-radius: 50%;
-            font-size: 1.25rem;
-            background: rgba(255, 255, 255, 0.9);
-            color: #111;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #options-panel {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 14px;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 150px;
-        }
-
-        #options-panel.active {
-            display: flex;
-        }
 
         #disco-overlay {
             position: absolute;
@@ -244,23 +206,6 @@
             }
         }
 
-        .option-btn {
-            border: 0;
-            border-radius: 10px;
-            padding: 8px 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            cursor: pointer;
-            background: #2a2a2a;
-            color: #fff;
-        }
-
-        .option-btn.active {
-            background: #ffffff;
-            color: #111;
-        }
-
         #new-game-btn {
             border: 0;
             border-radius: 999px;
@@ -342,6 +287,32 @@
             flex-wrap: wrap;
         }
 
+        .mode-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .modal-footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .modal-section {
+            margin-bottom: 14px;
+        }
+
+        .modal-section-title {
+            margin: 0 0 8px;
+            font-size: 0.95rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            opacity: 0.88;
+        }
+
         .modal-actions button {
             border: 0;
             border-radius: 12px;
@@ -358,6 +329,85 @@
         .btn-secondary {
             background: #2a2a2a;
             color: #fff;
+        }
+
+        .mode-choice-btn {
+            min-height: 58px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-radius: 999px;
+            border: 0;
+            box-shadow: none;
+            color: #fff;
+            transition: transform 0.15s ease, filter 0.2s ease;
+        }
+
+        .mode-choice-btn.selected {
+            outline: 3px solid rgba(255, 255, 255, 0.75);
+            transform: translateY(-1px) scale(1.01);
+            filter: saturate(1.1) brightness(1.04);
+            box-shadow: none;
+        }
+
+        .choice-normal {
+            background: #1e9f4d;
+        }
+
+        .choice-hard {
+            background: #d33d3d;
+        }
+
+        .choice-without-cards {
+            background: #4c5b70;
+        }
+
+        .choice-with-cards {
+            background: #2f7dcf;
+        }
+
+        .mode-choice-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: none;
+        }
+
+        #confirm-game-choices {
+            min-width: 210px;
+            min-height: 54px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 999px;
+            border: 0;
+            box-shadow: none;
+        }
+
+        #confirm-game-choices:disabled {
+            background: #5a5a5a;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #cancel-game-choices {
+            min-width: 210px;
+            min-height: 54px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 900;
+            border-radius: 999px;
+            border: 0;
+            box-shadow: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        #cancel-game-choices:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .history-dot {
@@ -400,15 +450,14 @@
                 top: 12px;
             }
 
-            #options-controls {
-                top: 12px;
-                right: 12px;
-            }
-
             #history-bar {
                 bottom: 20px;
                 padding: 10px;
                 gap: 8px;
+            }
+
+            .mode-actions {
+                grid-template-columns: 1fr;
             }
 
             .history-dot {
@@ -425,14 +474,6 @@
         <button id="new-game-btn" type="button">Nouvelle partie</button>
     </div>
 
-    <div id="options-controls">
-        <button id="options-toggle" type="button" aria-label="Options" title="Options">&#9881;</button>
-        <div id="options-panel" aria-label="Modes d'affichage">
-            <button id="option-with-cards" class="option-btn" type="button">Avec cartes</button>
-            <button id="option-without-cards" class="option-btn active" type="button">Sans cartes</button>
-        </div>
-    </div>
-
     <div id="instruction">HITSTER BINGO</div>
     <div id="challenge-display" aria-live="polite">
         <img id="challenge-image" alt="Illustration du challenge" src="">
@@ -444,22 +485,26 @@
     </div>
     <div id="history-bar"><div class="history-dot" style="background-color: rgb(153, 51, 255);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div><div class="history-dot" style="background-color: rgb(82, 201, 82);"></div><div class="history-dot" style="background-color: rgb(255, 51, 153);"></div><div class="history-dot" style="background-color: rgb(153, 51, 255);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div><div class="history-dot" style="background-color: rgb(231, 231, 78);"></div><div class="history-dot" style="background-color: rgb(51, 153, 255);"></div></div>
 
-    <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-        <div class="modal-box">
-            <p id="confirm-title">Voulez-vous lancer une nouvelle partie ?</p>
-            <div class="modal-actions">
-                <button id="confirm-yes" class="btn-primary" type="button">Oui</button>
-                <button id="confirm-no" class="btn-secondary" type="button">Non</button>
-            </div>
-        </div>
-    </div>
-
     <div id="difficulty-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="difficulty-title">
         <div class="modal-box">
             <p id="difficulty-title">Choisissez le mode de la nouvelle partie</p>
-            <div class="modal-actions">
-                <button id="mode-normal" class="btn-primary" type="button">Normal</button>
-                <button id="mode-hard" class="btn-secondary" type="button">Difficile</button>
+            <div class="modal-section">
+                <p class="modal-section-title">Mode</p>
+                <div class="mode-actions">
+                    <button id="mode-normal" class="mode-choice-btn choice-normal" type="button">Normal</button>
+                    <button id="mode-hard" class="mode-choice-btn choice-hard" type="button">Difficile</button>
+                </div>
+            </div>
+            <div class="modal-section">
+                <p class="modal-section-title">Affichage des cartes</p>
+                <div class="mode-actions">
+                    <button id="cards-without" class="mode-choice-btn choice-without-cards" type="button">Sans cartes</button>
+                    <button id="cards-with" class="mode-choice-btn choice-with-cards" type="button">Avec cartes</button>
+                </div>
+            </div>
+            <div class="modal-footer-actions">
+                <button id="cancel-game-choices" type="button">Annuler</button>
+                <button id="confirm-game-choices" class="btn-primary" type="button" disabled>Valider</button>
             </div>
         </div>
     </div>
@@ -475,28 +520,29 @@
         const miniChallengeImage = document.getElementById('mini-challenge-image');
         const miniChallengeText = document.getElementById('mini-challenge-text');
         const newGameBtn = document.getElementById('new-game-btn');
-        const confirmModal = document.getElementById('confirm-modal');
         const difficultyModal = document.getElementById('difficulty-modal');
-        const confirmYesBtn = document.getElementById('confirm-yes');
-        const confirmNoBtn = document.getElementById('confirm-no');
         const modeNormalBtn = document.getElementById('mode-normal');
         const modeHardBtn = document.getElementById('mode-hard');
-        const optionsToggleBtn = document.getElementById('options-toggle');
-        const optionsPanel = document.getElementById('options-panel');
-        const optionWithCardsBtn = document.getElementById('option-with-cards');
-        const optionWithoutCardsBtn = document.getElementById('option-without-cards');
+        const cardsWithoutBtn = document.getElementById('cards-without');
+        const cardsWithBtn = document.getElementById('cards-with');
+        const cancelGameChoicesBtn = document.getElementById('cancel-game-choices');
+        const confirmGameChoicesBtn = document.getElementById('confirm-game-choices');
         const discoOverlay = document.getElementById('disco-overlay');
 
         let started = false;
         let currentMode = 'normal';
         let optionsMode = 'without-cards';
         let currentRoundColor = null;
-        let shuffledCardNumbers = [];
+        let shuffledCards = [];
         let cardCursor = 0;
         let cardStep = 0;
         let transitionTimerIds = [];
         let isTransitionRunning = false;
         let discoOffTimerId = null;
+        let selectedModeChoice = null;
+        let selectedCardsChoice = null;
+        let lastSevenDrawnColors = [];
+        let colorTimeSinceDrawn = { '#ff3333': 0, '#9933FF': 0, '#52c952': 0, '#e7e74e': 0, '#3399FF': 0 };
 
         const imageBase = './img/';
         const colorKeyByHex = {
@@ -524,8 +570,14 @@
             }
         };
 
-        function shuffleCardNumbers() {
-            const values = Array.from({ length: 308 }, (_, i) => i + 1);
+        function shuffleCards() {
+            const values = [];
+
+            for (let i = 1; i <= 308; i += 1) {
+                values.push({ number: i, variant: '' });
+                values.push({ number: i, variant: '_summer' });
+            }
+
             for (let i = values.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [values[i], values[j]] = [values[j], values[i]];
@@ -533,19 +585,33 @@
             return values;
         }
 
-        function getCurrentCardNumber() {
-            if (cardCursor >= shuffledCardNumbers.length) {
-                shuffledCardNumbers = shuffleCardNumbers();
+        function getCurrentCard() {
+            if (cardCursor >= shuffledCards.length) {
+                shuffledCards = shuffleCards();
                 cardCursor = 0;
             }
-            return shuffledCardNumbers[cardCursor];
+            return shuffledCards[cardCursor];
         }
 
-        function setOptionsMode(mode) {
-            optionsMode = mode;
-            optionWithCardsBtn.classList.toggle('active', mode === 'with-cards');
-            optionWithoutCardsBtn.classList.toggle('active', mode === 'without-cards');
-            resetGameState(currentMode);
+        function startNewGame(mode, cardsMode) {
+            currentMode = mode;
+            optionsMode = cardsMode;
+            resetGameState(mode);
+        }
+
+        function updateGameChoiceButtons() {
+            modeNormalBtn.classList.toggle('selected', selectedModeChoice === 'normal');
+            modeHardBtn.classList.toggle('selected', selectedModeChoice === 'hard');
+            cardsWithoutBtn.classList.toggle('selected', selectedCardsChoice === 'without-cards');
+            cardsWithBtn.classList.toggle('selected', selectedCardsChoice === 'with-cards');
+
+            confirmGameChoicesBtn.disabled = !(selectedModeChoice && selectedCardsChoice);
+        }
+
+        function resetGameChoiceSelection() {
+            selectedModeChoice = null;
+            selectedCardsChoice = null;
+            updateGameChoiceButtons();
         }
 
         function getRuleForColor(color) {
@@ -596,7 +662,7 @@
         }
 
         function isModalOpen() {
-            return !confirmModal.classList.contains('hidden') || !difficultyModal.classList.contains('hidden');
+            return !difficultyModal.classList.contains('hidden');
         }
 
         function openModal(modal) {
@@ -613,7 +679,9 @@
             currentRoundColor = null;
             cardStep = 0;
             cardCursor = 0;
-            shuffledCardNumbers = shuffleCardNumbers();
+            lastSevenDrawnColors = [];
+            colorTimeSinceDrawn = { '#ff3333': 0, '#9933FF': 0, '#52c952': 0, '#e7e74e': 0, '#3399FF': 0 };
+            shuffledCards = shuffleCards();
             transitionTimerIds.forEach((timerId) => clearTimeout(timerId));
             transitionTimerIds = [];
             isTransitionRunning = false;
@@ -632,60 +700,102 @@
 
         newGameBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            openModal(confirmModal);
-        });
-
-        confirmNoBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            closeModal(confirmModal);
-        });
-
-        confirmYesBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            closeModal(confirmModal);
+            resetGameChoiceSelection();
             openModal(difficultyModal);
         });
 
         modeNormalBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            closeModal(difficultyModal);
-            resetGameState('normal');
+            selectedModeChoice = 'normal';
+            updateGameChoiceButtons();
         });
 
         modeHardBtn.addEventListener('click', (event) => {
             event.stopPropagation();
+            selectedModeChoice = 'hard';
+            updateGameChoiceButtons();
+        });
+
+        cardsWithoutBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            selectedCardsChoice = 'without-cards';
+            updateGameChoiceButtons();
+        });
+
+        cardsWithBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            selectedCardsChoice = 'with-cards';
+            updateGameChoiceButtons();
+        });
+
+        cancelGameChoicesBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
             closeModal(difficultyModal);
-            resetGameState('hard');
         });
 
-        optionsToggleBtn.addEventListener('click', (event) => {
+        confirmGameChoicesBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            optionsPanel.classList.toggle('active');
-        });
-
-        optionWithCardsBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            setOptionsMode('with-cards');
-            optionsPanel.classList.remove('active');
-        });
-
-        optionWithoutCardsBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            setOptionsMode('without-cards');
-            optionsPanel.classList.remove('active');
-        });
-
-        confirmModal.addEventListener('click', (event) => {
-            event.stopPropagation();
+            if (!(selectedModeChoice && selectedCardsChoice)) {
+                return;
+            }
+            closeModal(difficultyModal);
+            startNewGame(selectedModeChoice, selectedCardsChoice);
         });
 
         difficultyModal.addEventListener('click', (event) => {
             event.stopPropagation();
         });
 
-        optionsPanel.addEventListener('click', (event) => {
-            event.stopPropagation();
-        });
+        function getConstrainedColor() {
+            // Incrémenter les compteurs de temps pour toutes les couleurs non récemment tirées
+            colors.forEach((c) => {
+                if (lastSevenDrawnColors.indexOf(c) === -1) {
+                    colorTimeSinceDrawn[c] += 1;
+                }
+            });
+
+            // Fonction helper : compter les occurrences d'une couleur dans les 7 derniers tirages
+            const countColorInHistory = (color) => {
+                return lastSevenDrawnColors.filter(c => c === color).length;
+            };
+
+            // Chercher s'il y a une couleur non tirée depuis 7+ tirages
+            const maxTime = Math.max(...colors.map(c => colorTimeSinceDrawn[c]));
+            if (maxTime >= 7) {
+                // Prioriser les couleurs longtemps non tirées, éviter 3 d'affilée ET 2+ en 7 tirages
+                const candidates = colors.filter(
+                    (c) => colorTimeSinceDrawn[c] === maxTime && 
+                           countColorInHistory(c) < 2 &&
+                           !(lastSevenDrawnColors.length >= 2 && lastSevenDrawnColors[lastSevenDrawnColors.length - 1] === lastSevenDrawnColors[lastSevenDrawnColors.length - 2] && lastSevenDrawnColors[lastSevenDrawnColors.length - 1] === c)
+                );
+                const selected = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : colors[Math.floor(Math.random() * colors.length)];
+                lastSevenDrawnColors.push(selected);
+                if (lastSevenDrawnColors.length > 7) lastSevenDrawnColors.shift();
+                colorTimeSinceDrawn[selected] = 0;
+                return selected;
+            }
+
+            // Sinon, tirage aléatoire avec contraintes : évite 3 d'affilée ET 2+ en 7 tirages
+            let candidate;
+            let attempts = 0;
+            do {
+                candidate = colors[Math.floor(Math.random() * colors.length)];
+                attempts += 1;
+            } while (
+                attempts < 20 &&
+                (countColorInHistory(candidate) >= 2 ||
+                (lastSevenDrawnColors.length >= 2 &&
+                lastSevenDrawnColors[lastSevenDrawnColors.length - 1] === lastSevenDrawnColors[lastSevenDrawnColors.length - 2] &&
+                lastSevenDrawnColors[lastSevenDrawnColors.length - 1] === candidate))
+            );
+
+            // Updater l'historique et reset du compteur
+            lastSevenDrawnColors.push(candidate);
+            if (lastSevenDrawnColors.length > 7) lastSevenDrawnColors.shift();
+            colorTimeSinceDrawn[candidate] = 0;
+
+            return candidate;
+        }
 
         function renderChallengeForColor(color) {
             document.body.style.backgroundColor = color;
@@ -703,15 +813,15 @@
             dot.style.backgroundColor = color;
             bar.append(dot);
 
-            while (bar.children.length > 6) {
+            while (bar.children.length > 9) {
                 bar.removeChild(bar.firstElementChild);
             }
         }
 
         function renderCardImage(face) {
-            const cardNumber = getCurrentCardNumber();
+            const card = getCurrentCard();
             const suffix = face === 'recto' ? 'recto' : 'verso';
-            challengeImage.src = encodeURI(`./hitster_cards_transparent/${cardNumber}_${suffix}.png`);
+            challengeImage.src = encodeURI(`./hitster_cards_transparent/${card.number}_${suffix}${card.variant}.png`);
             challengeText.style.display = 'none';
             challengeDisplay.classList.add('active');
             text.style.display = 'none';
@@ -783,11 +893,9 @@
                 return;
             }
 
-            optionsPanel.classList.remove('active');
-
             if (optionsMode === 'with-cards') {
                 if (cardStep === 0) {
-                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const color = getConstrainedColor();
                     currentRoundColor = color;
                     runColorTransition(color, () => {
                         renderChallengeForColor(color);
@@ -813,7 +921,7 @@
                 return;
             }
 
-            const color = colors[Math.floor(Math.random() * colors.length)];
+            const color = getConstrainedColor();
 
             runColorTransition(color, () => {
                 renderChallengeForColor(color);
