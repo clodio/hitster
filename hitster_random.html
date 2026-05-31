@@ -574,8 +574,8 @@
             const values = [];
 
             for (let i = 1; i <= 308; i += 1) {
-                values.push({ number: i, variant: '' });
-                values.push({ number: i, variant: '_summer' });
+                values.push({ number: i, folder: 'hitster_cards_transparent', fileSuffix: '' });
+                values.push({ number: i, folder: 'hitster_cards_summer', fileSuffix: '_summer' });
             }
 
             for (let i = values.length - 1; i > 0; i--) {
@@ -821,7 +821,21 @@
         function renderCardImage(face) {
             const card = getCurrentCard();
             const suffix = face === 'recto' ? 'recto' : 'verso';
-            challengeImage.src = encodeURI(`./hitster_cards_transparent/${card.number}_${suffix}${card.variant}.png`);
+            const primarySrc = encodeURI(`./${card.folder}/${card.number}_${suffix}${card.fileSuffix}.png`);
+            const fallbackSrc = card.folder === 'hitster_cards_summer'
+                ? encodeURI(`./hitster_cards_transparent/${card.number}_${suffix}.png`)
+                : null;
+
+            if (fallbackSrc) {
+                challengeImage.onerror = () => {
+                    challengeImage.onerror = null;
+                    challengeImage.src = fallbackSrc;
+                };
+            } else {
+                challengeImage.onerror = null;
+            }
+
+            challengeImage.src = primarySrc;
             challengeText.style.display = 'none';
             challengeDisplay.classList.add('active');
             text.style.display = 'none';
